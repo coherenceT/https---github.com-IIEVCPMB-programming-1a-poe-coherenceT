@@ -10,7 +10,6 @@ package com.mycompany.quickchatcoherencemlambo1;
  */
 import javax.swing.*;
 import java.text.SimpleDateFormat;
-
 import java.util.Date;
 import org.json.simple.JSONObject;
 import java.security.MessageDigest;

@@ -1,8 +1,12 @@
 package com.mycompany.quickchatcoherencemlambo1;
 
+
 import javax.swing.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
-import java.io.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -14,34 +18,49 @@ public class QuickChatCoherenceMlambo1 {
     private static final List<Message> disregardedMessages = new ArrayList<>();
     private static final Set<String> messageHashes = new HashSet<>();
     private static final Set<String> messageIDs = new HashSet<>();
-    
     private static int totalMessagesSent = 0;
     private static String currentUser;
+    private static AccountManager accountManager;
 
     public static void main(String[] args) {
-        // User login
-        currentUser = JOptionPane.showInputDialog(null,
-                "Welcome to QuickChat by Coherence Tasimba Mlambo.\nEnter your username:");
-        if (currentUser == null || currentUser.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Login failed. Exiting...");
+        accountManager = new AccountManager();
+        // Initial prompt: Login or Register
+        String[] options = {"Login", "Register", "Exit"};
+        int choice = JOptionPane.showOptionDialog(null,
+                "Welcome to QuickChat by Coherence Tasimba Mlambo.\nChoose an option:",
+                "QuickChat",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]);
+        if (choice == 2 || choice == JOptionPane.CLOSED_OPTION) {
             System.exit(0);
         }
-        
-        JOptionPane.showMessageDialog(null, "Welcome, " + currentUser + "!");
+        if (choice == 1) { // Register
+            boolean registered = accountManager.registerNewUser();
+            if (!registered) System.exit(0);
+            // After registration, go to login
+        }
+        // Login flow
+        currentUser = accountManager.loginUser();
+        if (currentUser == null) {
+            System.exit(0);
+        }
+        // After successful login
         loadMessagesFromFile();
-        
+
         // Main application loop
         while (true) {
             String menu = "QuickChat Menu:\n"
                     + "1) Send Messages\n"
                     + "2) View Recent Messages\n"
                     + "3) Advanced Features\n"
-                    + "4) Exit";
+                    + "4) Logout and Exit";
             
-            String choice = JOptionPane.showInputDialog(null, menu);
-            if (choice == null) System.exit(0);
-            
-            switch (choice) {
+            String input = JOptionPane.showInputDialog(null, menu);
+            if (input == null) System.exit(0);
+            switch (input) {
                 case "1": sendMessages(); break;
                 case "2": displayRecentMessages(); break;
                 case "3": showAdvancedMenu(); break;
@@ -112,14 +131,19 @@ public class QuickChatCoherenceMlambo1 {
     }
 
     private static String getValidRecipient() {
+        Set<String> usernames = accountManager.getAllUsernames();
         while (true) {
-            String recipient = JOptionPane.showInputDialog("Enter recipient (e.g., +27123456789):");
+            String recipient = JOptionPane.showInputDialog("Enter recipient username:");
             if (recipient == null) return null;
-            
-            if (Message.isValidRecipient(recipient)) {
+            recipient = recipient.trim();
+            if (recipient.equals(currentUser)) {
+                JOptionPane.showMessageDialog(null, "Cannot send to yourself. Choose another user.");
+                continue;
+            }
+            if (usernames.contains(recipient)) {
                 return recipient;
             }
-            JOptionPane.showMessageDialog(null, "Invalid recipient format. Use international format.");
+            JOptionPane.showMessageDialog(null, "Recipient not found. Make sure the user is registered.");
         }
     }
 
@@ -153,6 +177,13 @@ public class QuickChatCoherenceMlambo1 {
         JSONParser parser = new JSONParser();
         try (FileReader reader = new FileReader(file)) {
             JSONArray jsonArray = (JSONArray) parser.parse(reader);
+            // Clear current lists
+            sentMessages.clear();
+            storedMessages.clear();
+            disregardedMessages.clear();
+            messageIDs.clear();
+            messageHashes.clear();
+            totalMessagesSent = 0;
             
             for (Object obj : jsonArray) {
                 JSONObject json = (JSONObject) obj;
@@ -164,16 +195,20 @@ public class QuickChatCoherenceMlambo1 {
                 String status = (String) json.get("status");
                 String timestamp = (String) json.get("timestamp");
                 
+                // Only load messages where sender or recipient is currentUser
+                if (!currentUser.equals(sender) && !currentUser.equals(recipient)) {
+                    continue;
+                }
+                
                 Message msg = new Message(id, num, recipient, content, sender, timestamp);
                 switch (status) {
-                    case "sent": sentMessages.add(msg); break;
+                    case "sent": sentMessages.add(msg); totalMessagesSent++; break;
                     case "stored": storedMessages.add(msg); break;
                     case "disregarded": disregardedMessages.add(msg); break;
                 }
                 
                 messageIDs.add(id);
                 messageHashes.add(msg.createMessageHash());
-                if (status.equals("sent")) totalMessagesSent++;
             }
         } catch (IOException | ParseException e) {
             JOptionPane.showMessageDialog(null, "Error loading messages: " + e.getMessage());
@@ -182,14 +217,34 @@ public class QuickChatCoherenceMlambo1 {
 
     @SuppressWarnings("unchecked")
     private static void saveMessagesToFile() {
-        JSONArray jsonArray = new JSONArray();
+        // Read existing file, but preserve entries for other users
+        JSONArray allArray = new JSONArray();
+        File file = new File("chat_history.json");
+        JSONParser parser = new JSONParser();
+        if (file.exists()) {
+            try (FileReader reader = new FileReader(file)) {
+                JSONArray existing = (JSONArray) parser.parse(reader);
+                // Keep entries not related to currentUser
+                for (Object obj : existing) {
+                    JSONObject json = (JSONObject) obj;
+                    String sender = (String) json.get("sender");
+                    String recipient = (String) json.get("recipient");
+                    if (currentUser.equals(sender) || currentUser.equals(recipient)) {
+                        continue; // we will re-add updated ones
+                    }
+                    allArray.add(json);
+                }
+            } catch (IOException | ParseException e) {
+                JOptionPane.showMessageDialog(null, "Error reading existing history: " + e.getMessage());
+            }
+        }
+        // Add current user's messages
+        addMessagesToArray(allArray, sentMessages, "sent");
+        addMessagesToArray(allArray, storedMessages, "stored");
+        addMessagesToArray(allArray, disregardedMessages, "disregarded");
         
-        addMessagesToArray(jsonArray, sentMessages, "sent");
-        addMessagesToArray(jsonArray, storedMessages, "stored");
-        addMessagesToArray(jsonArray, disregardedMessages, "disregarded");
-        
-        try (FileWriter file = new FileWriter("chat_history.json")) {
-            file.write(jsonArray.toJSONString());
+        try (FileWriter fw = new FileWriter("chat_history.json")) {
+            fw.write(allArray.toJSONString());
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Error saving messages: " + e.getMessage());
         }
@@ -204,7 +259,7 @@ public class QuickChatCoherenceMlambo1 {
     }
 
     private static void displayRecentMessages() {
-        StringBuilder sb = new StringBuilder("=== MESSAGE HISTORY ===\n\n");
+        StringBuilder sb = new StringBuilder("=== MESSAGE HISTORY for " + currentUser + " ===\n\n");
         
         if (sentMessages.isEmpty() && storedMessages.isEmpty() && disregardedMessages.isEmpty()) {
             sb.append("No messages found");
@@ -225,7 +280,10 @@ public class QuickChatCoherenceMlambo1 {
             }
         }
         
-        JOptionPane.showMessageDialog(null, sb.toString());
+        JTextArea textArea = new JTextArea(sb.toString());
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        textArea.setEditable(false);
+        JOptionPane.showMessageDialog(null, scrollPane, "Message History", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private static void showAdvancedMenu() {
@@ -255,7 +313,7 @@ public class QuickChatCoherenceMlambo1 {
     }
 
     private static void showSenderRecipients() {
-        StringBuilder sb = new StringBuilder("SENDER/RECIPIENT PAIRS:\n\n");
+        StringBuilder sb = new StringBuilder("SENDER/RECIPIENT PAIRS (for sent messages):\n\n");
         for (Message msg : sentMessages) {
             sb.append(msg.getSender()).append(" → ").append(msg.getRecipient()).append("\n");
         }
@@ -292,7 +350,7 @@ public class QuickChatCoherenceMlambo1 {
     }
 
     private static void searchByRecipient() {
-        String recipient = JOptionPane.showInputDialog("Enter recipient number:");
+        String recipient = JOptionPane.showInputDialog("Enter recipient username:");
         if (recipient == null) return;
         
         StringBuilder sb = new StringBuilder("MESSAGES TO " + recipient + ":\n\n");
@@ -325,7 +383,7 @@ public class QuickChatCoherenceMlambo1 {
     }
 
     private static void showFullReport() {
-        StringBuilder sb = new StringBuilder("FULL MESSAGE REPORT:\n\n");
+        StringBuilder sb = new StringBuilder("FULL MESSAGE REPORT (sent messages):\n\n");
         for (Message msg : sentMessages) {
             sb.append("Hash: ").append(msg.createMessageHash()).append("\n")
               .append("Recipient: ").append(msg.getRecipient()).append("\n")
@@ -343,7 +401,7 @@ public class QuickChatCoherenceMlambo1 {
 
     private static void exitApplication() {
         JOptionPane.showMessageDialog(null, 
-            "Goodbye, " + currentUser + "!\nTotal messages sent: " + totalMessagesSent);
+            "Goodbye, " + currentUser + "!\nTotal messages sent this session: " + totalMessagesSent);
         System.exit(0);
     }
 }

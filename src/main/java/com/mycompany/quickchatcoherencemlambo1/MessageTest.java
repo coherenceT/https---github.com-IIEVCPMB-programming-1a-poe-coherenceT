@@ -74,3 +74,4 @@ class MessageTest {
         assertNotNull(json.get("timestamp"));
     }
 }
+
