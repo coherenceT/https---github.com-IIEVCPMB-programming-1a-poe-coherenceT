@@ -10,8 +10,13 @@ package com.mycompany.quickchatcoherencemlambo1;
  */
 import javax.swing.*;
 import java.text.SimpleDateFormat;
+
 import java.util.Date;
 import org.json.simple.JSONObject;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 public class Message {
     private final String messageID;
@@ -21,6 +26,7 @@ public class Message {
     private final String sender;
     private final String timestamp;
 
+    // Constructor for new messages
     public Message(String messageID, int messageNumber, String recipient, String content, String sender) {
         this.messageID = messageID;
         this.messageNumber = messageNumber;
@@ -28,6 +34,16 @@ public class Message {
         this.content = content;
         this.sender = sender;
         this.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+    }
+
+    // Constructor for loading from JSON with existing timestamp
+    public Message(String messageID, int messageNumber, String recipient, String content, String sender, String timestamp) {
+        this.messageID = messageID;
+        this.messageNumber = messageNumber;
+        this.recipient = recipient;
+        this.content = content;
+        this.sender = sender;
+        this.timestamp = timestamp;
     }
 
     public static boolean isValidRecipient(String recipient) {
@@ -44,7 +60,8 @@ public class Message {
     }
 
     public static String generateMessageID() {
-        return String.format("%010d", new java.util.Random().nextInt(1000000000));
+        // Use UUID for unique ID
+        return UUID.randomUUID().toString();
     }
 
     public String selectMessageAction() {
@@ -61,7 +78,21 @@ public class Message {
     }
 
     public String createMessageHash() {
-        return Integer.toHexString((sender + recipient + content + timestamp).hashCode());
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            String input = sender + recipient + content + timestamp;
+            byte[] hashBytes = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hashBytes) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            // Fallback
+            return Integer.toHexString((sender + recipient + content + timestamp).hashCode());
+        }
     }
 
     public String fullMessageDetails() {

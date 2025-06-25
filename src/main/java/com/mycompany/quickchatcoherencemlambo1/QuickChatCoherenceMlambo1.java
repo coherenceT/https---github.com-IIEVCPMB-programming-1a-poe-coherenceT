@@ -1,7 +1,6 @@
 package com.mycompany.quickchatcoherencemlambo1;
 
 import javax.swing.*;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.io.*;
 import org.json.simple.JSONArray;
@@ -163,8 +162,9 @@ public class QuickChatCoherenceMlambo1 {
                 String content = (String) json.get("content");
                 String sender = (String) json.get("sender");
                 String status = (String) json.get("status");
+                String timestamp = (String) json.get("timestamp");
                 
-                Message msg = new Message(id, num, recipient, content, sender);
+                Message msg = new Message(id, num, recipient, content, sender, timestamp);
                 switch (status) {
                     case "sent": sentMessages.add(msg); break;
                     case "stored": storedMessages.add(msg); break;

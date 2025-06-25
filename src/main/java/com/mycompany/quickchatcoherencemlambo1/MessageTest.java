@@ -26,7 +26,7 @@ class MessageTest {
     void testInvalidRecipient() {
         assertFalse(Message.isValidRecipient("abc"));
         assertFalse(Message.isValidRecipient("123"));
-        assertFalse(Message.isValidRecipient("+1234567890123")); // too long
+        assertFalse(Message.isValidRecipient("+1234567890123")); // too long (>13 digits)
         assertFalse(Message.isValidRecipient(null));
     }
 
@@ -46,8 +46,8 @@ class MessageTest {
     void testMessageIDGeneration() {
         String id = Message.generateMessageID();
         assertNotNull(id);
-        assertEquals(10, id.length());
-        assertTrue(Pattern.matches("\\d{10}", id));
+        // UUID length is 36 characters
+        assertEquals(36, id.length());
     }
 
     @Test
@@ -55,7 +55,9 @@ class MessageTest {
         Message msg = new Message("1234567890", 1, "+27123456789", "Test message", "user1");
         String hash = msg.createMessageHash();
         assertNotNull(hash);
-        assertEquals(8, hash.length()); // Standard hex hash length
+        // SHA-256 produces 64 hex characters
+        assertEquals(64, hash.length());
+        assertTrue(Pattern.matches("[a-f0-9]{64}", hash));
     }
 
     @Test
@@ -64,6 +66,7 @@ class MessageTest {
         JSONObject json = msg.toJSON();
         
         assertEquals("9876543210", json.get("messageID"));
+        // JSON-simple stores integers as Long
         assertEquals(2L, json.get("messageNumber"));
         assertEquals("+441234567890", json.get("recipient"));
         assertEquals("JSON test", json.get("content"));

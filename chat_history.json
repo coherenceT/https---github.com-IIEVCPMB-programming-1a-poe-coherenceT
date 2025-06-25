@@ -1,47 +1,138 @@
 [
     {
-      "messageNumber": 1,
-      "sender": "TestUser",
-      "recipient": "+27834557896",
-      "messageID": "MSG-1001",
-      "content": "Did you get the cake?",
-      "timestamp": "2025-06-25 14:39:09",
+      "messageNumber": 6,
+      "sender": "+27834557896",
+      "recipient": "TestUser",
+      "messageID": "GENERATED-UUID-1",
+      "content": "Thanks for the message. I'll get back to you soon.",
+      "timestamp": "2025-06-25 14:44:09",
       "status": "sent"
     },
     {
-      "messageNumber": 2,
-      "sender": "TestUser",
-      "recipient": "+27838884567",
-      "messageID": "MSG-1002",
-      "content": "Where are you? You are late! I have asked you to be on time.",
-      "timestamp": "2025-06-25 14:39:09",
-      "status": "stored"
-    },
-    {
-      "messageNumber": 3,
-      "sender": "TestUser",
-      "recipient": "+27834484567",
-      "messageID": "MSG-1003",
-      "content": "Yohoooo, I am at your gate.",
-      "timestamp": "2025-06-25 14:39:09",
-      "status": "disregard"
-    },
-    {
-      "messageNumber": 4,
-      "sender": "TestUser",
-      "recipient": "0838884567",
-      "messageID": "MSG-1004",
-      "content": "It is dinner time !",
-      "timestamp": "2025-06-25 14:39:09",
+      "messageNumber": 7,
+      "sender": "+27834557896",
+      "recipient": "TestUser",
+      "messageID": "GENERATED-UUID-2",
+      "content": "Yes, I received the cake. Thank you!",
+      "timestamp": "2025-06-25 14:45:09",
       "status": "sent"
     },
     {
-      "messageNumber": 5,
-      "sender": "TestUser",
-      "recipient": "+27838884567",
-      "messageID": "MSG-1005",
-      "content": "Ok, I am leaving without you.",
-      "timestamp": "2025-06-25 14:39:09",
-      "status": "stored"
+      "messageNumber": 8,
+      "sender": "+27834557896",
+      "recipient": "TestUser",
+      "messageID": "GENERATED-UUID-3",
+      "content": "👍 Got it.",
+      "timestamp": "2025-06-25 14:46:09",
+      "status": "sent"
+    },
+    {
+      "messageNumber": 9,
+      "sender": "+27838884567",
+      "recipient": "TestUser",
+      "messageID": "GENERATED-UUID-4",
+      "content": "Thanks for the message. I'll get back to you soon.",
+      "timestamp": "2025-06-25 14:44:09",
+      "status": "sent"
+    },
+    {
+      "messageNumber": 10,
+      "sender": "+27838884567",
+      "recipient": "TestUser",
+      "messageID": "GENERATED-UUID-5",
+      "content": "I'm on my way. Be there in 10 minutes.",
+      "timestamp": "2025-06-25 14:45:09",
+      "status": "sent"
+    },
+    {
+      "messageNumber": 11,
+      "sender": "+27838884567",
+      "recipient": "TestUser",
+      "messageID": "GENERATED-UUID-6",
+      "content": "👍 Got it.",
+      "timestamp": "2025-06-25 14:46:09",
+      "status": "sent"
+    },
+    {
+      "messageNumber": 12,
+      "sender": "+27834484567",
+      "recipient": "TestUser",
+      "messageID": "GENERATED-UUID-7",
+      "content": "Thanks for the message. I'll get back to you soon.",
+      "timestamp": "2025-06-25 14:44:09",
+      "status": "sent"
+    },
+    {
+      "messageNumber": 13,
+      "sender": "+27834484567",
+      "recipient": "TestUser",
+      "messageID": "GENERATED-UUID-8",
+      "content": "Great, I'll come to the gate now.",
+      "timestamp": "2025-06-25 14:45:09",
+      "status": "sent"
+    },
+    {
+      "messageNumber": 14,
+      "sender": "+27834484567",
+      "recipient": "TestUser",
+      "messageID": "GENERATED-UUID-9",
+      "content": "👍 Got it.",
+      "timestamp": "2025-06-25 14:46:09",
+      "status": "sent"
+    },
+    {
+      "messageNumber": 15,
+      "sender": "0838884567",
+      "recipient": "TestUser",
+      "messageID": "GENERATED-UUID-10",
+      "content": "Thanks for the message. I'll get back to you soon.",
+      "timestamp": "2025-06-25 14:44:09",
+      "status": "sent"
+    },
+    {
+      "messageNumber": 16,
+      "sender": "0838884567",
+      "recipient": "TestUser",
+      "messageID": "GENERATED-UUID-11",
+      "content": "Okay, what time should I arrive?",
+      "timestamp": "2025-06-25 14:45:09",
+      "status": "sent"
+    },
+    {
+      "messageNumber": 17,
+      "sender": "0838884567",
+      "recipient": "TestUser",
+      "messageID": "GENERATED-UUID-12",
+      "content": "👍 Got it.",
+      "timestamp": "2025-06-25 14:46:09",
+      "status": "sent"
+    },
+    {
+      "messageNumber": 18,
+      "sender": "+27838884567",
+      "recipient": "TestUser",
+      "messageID": "GENERATED-UUID-13",
+      "content": "Thanks for the message. I'll get back to you soon.",
+      "timestamp": "2025-06-25 14:44:09",
+      "status": "sent"
+    },
+    {
+      "messageNumber": 19,
+      "sender": "+27838884567",
+      "recipient": "TestUser",
+      "messageID": "GENERATED-UUID-14",
+      "content": "Understood. Safe travels.",
+      "timestamp": "2025-06-25 14:45:09",
+      "status": "sent"
+    },
+    {
+      "messageNumber": 20,
+      "sender": "+27838884567",
+      "recipient": "TestUser",
+      "messageID": "GENERATED-UUID-15",
+      "content": "👍 Got it.",
+      "timestamp": "2025-06-25 14:46:09",
+      "status": "sent"
     }
   ]
+  
